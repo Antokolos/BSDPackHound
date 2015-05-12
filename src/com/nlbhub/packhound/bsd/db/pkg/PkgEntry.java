@@ -29,16 +29,14 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.nlbhub.packhound.fbsd.db.pkg;
-
-import java.io.File;
+package com.nlbhub.packhound.bsd.db.pkg;
 
 import com.nlbhub.packhound.config.PackHoundParameters;
-import com.nlbhub.packhound.arch.UnTbz;
+import com.nlbhub.packhound.util.FileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.nlbhub.packhound.util.FileHelper;
+import java.io.File;
 
 /**
  *
@@ -47,7 +45,7 @@ import com.nlbhub.packhound.util.FileHelper;
  * @author Anton P. Kolosov
  * @version 1.0
  */
-public class PkgEntry {
+public abstract class PkgEntry {
     /* Static variables begin ==> */
     private static Logger LOG = LoggerFactory.getLogger(PkgEntry.class);
     /* <== Static variables end. */
@@ -63,7 +61,7 @@ public class PkgEntry {
     /**
      * Creating PkgEntry
      */
-    public PkgEntry() {
+    protected PkgEntry() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -80,16 +78,16 @@ public class PkgEntry {
      * otherwise.
      */
     public boolean init(
-        String strPackageFileName, PackHoundParameters phParms
+            String strPackageFileName, PackHoundParameters phParms
     ) throws Exception {
         int iExtensionPos = strPackageFileName.lastIndexOf(".");
         m_strPackageDirName = (
-            strPackageFileName.substring(0, iExtensionPos)
+                strPackageFileName.substring(0, iExtensionPos)
         );
         File pkgDir = (
-            new File(phParms.getPkgDatabaseDir(), m_strPackageDirName)
+                new File(phParms.getPkgDatabaseDir(), m_strPackageDirName)
         );
-        
+
         if (pkgDir.isDirectory()) {
             StringBuilder sb = new StringBuilder();
             sb.append("Package dir for ").append(strPackageFileName);
@@ -97,14 +95,12 @@ public class PkgEntry {
             LOG.info(sb.toString());
             return true;
         } else {
-            
+
             StringBuilder sb = new StringBuilder();
             sb.append("Trying to read ").append(strPackageFileName);
             sb.append("... ");
             LOG.info(sb.toString());
-            if (
-                UnTbz.unTbzFBSDPackageContents(phParms, strPackageFileName)
-            ) {
+            if (unpackPackageContents(phParms, strPackageFileName)) {
                 boolean result = pkgDir.mkdir();
                 if (result) {
                     StringBuilder sb1 = new StringBuilder();
@@ -119,7 +115,7 @@ public class PkgEntry {
                     return true;
                 } else {
                     throw new Exception(
-                        "Cannot create package entry dir in pkg db"
+                            "Cannot create package entry dir in pkg db"
                     );
                 }
             } else {
@@ -127,11 +123,13 @@ public class PkgEntry {
             }
         }
     }
-    
+
+    public abstract boolean unpackPackageContents(PackHoundParameters phParms, String zipFName);
+
     public String getPackageDirName() {
         return m_strPackageDirName;
     }
-    
+
     public PkgVersion getPkgVersion() {
         String[] pkgDirNameComponents = m_strPackageDirName.split("-");
         int iComponentsCount = pkgDirNameComponents.length;

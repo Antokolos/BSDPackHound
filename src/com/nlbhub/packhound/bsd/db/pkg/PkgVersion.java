@@ -29,7 +29,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.nlbhub.packhound.fbsd.db.pkg;
+package com.nlbhub.packhound.bsd.db.pkg;
 
 import java.io.InputStream;
 
@@ -77,8 +77,7 @@ public class PkgVersion implements Comparable<PkgVersion> {
      * @param versionString string representation of the version, in
      * format 1.2.3_4. Here 4 is the subversion
      */
-    public void init(String versionString) 
-    throws Exception {
+    public void init(String versionString) throws Exception {
         if (m_versionArray != null) {
             throw new Exception("Package version is already initialized.");
         }

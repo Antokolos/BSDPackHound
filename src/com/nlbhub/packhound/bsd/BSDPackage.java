@@ -31,18 +31,16 @@
  */
 package com.nlbhub.packhound.bsd;
 
-import java.util.ArrayList;
-import java.io.*;
-import java.net.MalformedURLException;
-
+import com.nlbhub.packhound.bsd.db.pkg.PkgEntry;
+import com.nlbhub.packhound.bsd.db.pkg.PkgVersion;
 import com.nlbhub.packhound.config.PackHoundParameters;
-import com.nlbhub.packhound.fbsd.db.pkg.PkgVersion;
+import net.javabeat.ftp.FileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.javabeat.ftp.FileUpload;
-
-import com.nlbhub.packhound.fbsd.db.pkg.PkgEntry;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
 
 
 /**
@@ -65,6 +63,7 @@ public abstract class BSDPackage {
     /* <== Static blocks end. */
 
     /* Constructors begin ==> */
+
     /**
      * Creating FBSDPackage
      */
@@ -78,6 +77,7 @@ public abstract class BSDPackage {
 
     /**
      * Gets m_strPackageFileName
+     *
      * @return the m_strPackageFileName
      */
     public String getPackageFileName() {
@@ -86,6 +86,7 @@ public abstract class BSDPackage {
 
     /**
      * Sets m_strPackageFileName
+     *
      * @param mStrPackageFileName the m_strPackageFileName to set
      */
     public void setPackageFileName(String mStrPackageFileName) {
@@ -94,6 +95,7 @@ public abstract class BSDPackage {
 
     /**
      * Gets m_lstPkgDeps
+     *
      * @return the m_lstPkgDeps
      */
     public ArrayList<BSDPackage> getPkgDeps() {
@@ -102,6 +104,7 @@ public abstract class BSDPackage {
 
     /**
      * Sets m_lstPkgDeps
+     *
      * @param mLstPkgDeps the m_lstPkgDeps to set
      */
     public void setPkgDeps(ArrayList<BSDPackage> mLstPkgDeps) {
@@ -110,8 +113,9 @@ public abstract class BSDPackage {
 
     /**
      * Initializes FBSDPackage by reading +CONTENTS file from temp folder
+     *
      * @param strPackageFileName name of THIS package
-     * @param phParms program parameters
+     * @param phParms            program parameters
      */
     public void init(
             String strPackageFileName,
@@ -128,7 +132,7 @@ public abstract class BSDPackage {
         m_strPackageFileName = strPackageFileName;
 
         try {
-            PkgEntry pkgEntry = new PkgEntry();
+            PkgEntry pkgEntry = newPkgEntry();
             if (pkgEntry.init(strPackageFileName, phParms)) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(phParms.getPkgDatabaseDir()).append("/");
@@ -240,6 +244,8 @@ public abstract class BSDPackage {
         }
     }
 
+    protected abstract PkgEntry newPkgEntry();
+
     protected abstract BSDPackage getDependency(String curLine);
 
     protected abstract String getRelativePathToPkgs();
@@ -251,6 +257,7 @@ public abstract class BSDPackage {
     /**
      * Return a string representation.
      * DO NOT acts recursively!
+     *
      * @return String representation
      */
     @Override

@@ -69,17 +69,17 @@ public abstract class BSDPackInitializer {
 
     /* <== Constructors end. */
     /* Methods begin ==> */
-    public void InitFBSDPacks(
+    public void initBSDPacks(
             String basePkgName, final PackHoundParameters pkgHP
     ) {
         BSDPackage pkg = newPackage();
         pkg.init(basePkgName, null, pkgHP);
-        InitBSDPacks(pkg, pkgHP);
+        initBSDPacks(pkg, pkgHP);
     }
 
     protected abstract BSDPackage newPackage();
 
-    public void InitBSDPacks(
+    private void initBSDPacks(
             BSDPackage basePkg, final PackHoundParameters pkgHP
     ) {
         ArrayList<BSDPackage> lstDeps = basePkg.getPkgDeps();
@@ -105,7 +105,7 @@ public abstract class BSDPackInitializer {
                         basePkg.getPackageFileName(),
                         pkgHP
                 );
-                InitBSDPacks(pkgCur, pkgHP);
+                initBSDPacks(pkgCur, pkgHP);
             }
         }
     }

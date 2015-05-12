@@ -1,5 +1,5 @@
 /*
- * @(#)FBSDPackage.java
+ * @(#)BSDPackNameResolver.java
  *
  * Copyright (c) 2015, Anton P. Kolosov
  * All rights reserved.
@@ -29,38 +29,20 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.nlbhub.packhound.fbsd;
+package com.nlbhub.packhound.bsd;
 
-import com.nlbhub.packhound.bsd.BSDPackage;
-import com.nlbhub.packhound.bsd.db.pkg.PkgEntry;
-import com.nlbhub.packhound.fbsd.db.pkg.FBSDPkgEntry;
+import com.nlbhub.packhound.config.PackHoundParameters;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
- * The FBSDPackage class. 
+ * The BSDPackNameResolver class.
  *
  * @author Anton P. Kolosov
  * @version 1.0
  */
-public class FBSDPackage extends BSDPackage {
-
-    @Override
-    protected PkgEntry newPkgEntry() {
-        return new FBSDPkgEntry();
-    }
-
-    @Override
-    protected BSDPackage getDependency(String curLine) {
-        if (curLine.startsWith("@pkgdep")) {
-            FBSDPackage pkgDepCur = new FBSDPackage();
-            pkgDepCur.setStrPackageFileName(curLine.substring(8) + ".tbz");
-            return pkgDepCur;
-        }
-        return null;
-    }
-
-    @Override
-    protected String getRelativePathToPkgs() {
-        return "/All";
-    }
+public interface BSDPackNameResolver {
+    public void retrieveIndex(boolean forceIndexReload, PackHoundParameters phParms);
+    public String getFullPackageName(String pkgNameWithoutVersion, PackHoundParameters phParms) throws IOException;
 }
