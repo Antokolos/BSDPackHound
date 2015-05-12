@@ -33,7 +33,7 @@ package com.nlbhub.packhound.fbsd.db.pkg;
 
 import java.io.File;
 
-import com.nlbhub.packhound.fbsd.PackHoundParameters;
+import com.nlbhub.packhound.config.PackHoundParameters;
 import com.nlbhub.packhound.arch.UnTbz;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

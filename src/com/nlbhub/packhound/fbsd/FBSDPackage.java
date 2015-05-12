@@ -31,17 +31,7 @@
  */
 package com.nlbhub.packhound.fbsd;
 
-import java.util.ArrayList;
-import java.io.*;
-import java.net.MalformedURLException;
-
-import com.nlbhub.packhound.fbsd.db.pkg.PkgVersion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import net.javabeat.ftp.FileUpload;
-
-import com.nlbhub.packhound.fbsd.db.pkg.PkgEntry;
+import com.nlbhub.packhound.bsd.BSDPackage;
 
 
 /**
@@ -50,253 +40,20 @@ import com.nlbhub.packhound.fbsd.db.pkg.PkgEntry;
  * @author Anton P. Kolosov
  * @version 1.0
  */
-public class FBSDPackage {
-    /* Static variables begin ==> */
-    private static Logger LOG = LoggerFactory.getLogger(FBSDPackage.class);
-    /* <== Static variables end. */
+public class FBSDPackage extends BSDPackage {
 
-    /* Instance variables begin ==> */
-    private String m_strPackageFileName;
-    private ArrayList<FBSDPackage> m_lstPkgDeps;
-    /* <== Instance variables end. */
-
-    /* Static blocks begin ==> */
-    /* <== Static blocks end. */
-
-    /* Constructors begin ==> */
-    /**
-     * Creating FBSDPackage
-     */
-    public FBSDPackage() {
-        super();
-        m_strPackageFileName = "";
-        m_lstPkgDeps = new ArrayList<FBSDPackage>();
-    }
-    /* <== Constructors end. */
-    /* Methods begin ==> */
-
-    /**
-     * Gets m_strPackageFileName
-     * @return the m_strPackageFileName
-     */
-    public String getPackageFileName() {
-        return m_strPackageFileName;
-    }
-
-    /**
-     * Sets m_strPackageFileName
-     * @param mStrPackageFileName the m_strPackageFileName to set
-     */
-    public void setPackageFileName(String mStrPackageFileName) {
-        m_strPackageFileName = mStrPackageFileName;
-    }
-
-    /**
-     * Gets m_lstPkgDeps
-     * @return the m_lstPkgDeps
-     */
-    public ArrayList<FBSDPackage> getPkgDeps() {
-        return m_lstPkgDeps;
-    }
-
-    /**
-     * Sets m_lstPkgDeps
-     * @param mLstPkgDeps the m_lstPkgDeps to set
-     */
-    public void setPkgDeps(ArrayList<FBSDPackage> mLstPkgDeps) {
-        m_lstPkgDeps = mLstPkgDeps;
-    }
-
-    /**
-     * Initializes FBSDPackage by reading +CONTENTS file from temp folder
-     * @param strPackageFileName name of THIS package
-     * @param phParms program parameters
-     */
-    public void init(
-        String strPackageFileName,
-        String strBasePackageFileName,
-        PackHoundParameters phParms
-    ) {
-        LineNumberReader lineNumberReader = null;
-        FileReader fileReader = null;
-        FileWriter fwrRequiredBy = null;
-        FileReader frReq = null;
-        LineNumberReader lnrReq = null;
-        String strCurLine;
-        
-        m_strPackageFileName = strPackageFileName;
-        
-        try {
-            PkgEntry pkgEntry = new PkgEntry();
-            if (pkgEntry.init(strPackageFileName, phParms)) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(phParms.getPkgDatabaseDir()).append("/");
-                sb.append(pkgEntry.getPackageDirName()).append("/+REQUIRED_BY");
-                File fRequiredBy = new File(sb.toString());
-                
-                boolean needToInclude = true;
-                if (fRequiredBy.isFile()) {
-                    frReq = new FileReader(sb.toString());
-                    lnrReq = (
-                        new LineNumberReader(frReq)
-                    );
-                    
-                    while ((strCurLine = lnrReq.readLine()) != null) {
-                        if (strCurLine.equals(strBasePackageFileName)) {
-                            needToInclude = false;
-                            break;
-                        }
-                    }
-                } else {
-                    fRequiredBy.createNewFile();
-                }
-                
-                if (needToInclude && (strBasePackageFileName != null)) {
-                    fwrRequiredBy = new FileWriter(fRequiredBy, true);
-                    fwrRequiredBy.append(strBasePackageFileName);
-                    fwrRequiredBy.append(PackHoundParameters.getNewline());
-                }
-                
-                StringBuilder sbc = new StringBuilder();
-                sbc.append(phParms.getPkgDatabaseDir()).append("/");
-                sbc.append(pkgEntry.getPackageDirName()).append("/+CONTENTS");
-                fileReader = new FileReader(sbc.toString());
-                lineNumberReader = (
-                    new LineNumberReader(fileReader)
-                );
-                
-                while ((strCurLine = lineNumberReader.readLine()) != null) {
-                    if (strCurLine.startsWith("@pkgdep")) {
-                        FBSDPackage pkgDepCur = new FBSDPackage();
-                        pkgDepCur.m_strPackageFileName = (
-                            strCurLine.substring(8) + ".tbz"
-                        );
-                        m_lstPkgDeps.add(pkgDepCur);
-                    }
-                }
-            } else {
-                LOG.warn(
-                    m_strPackageFileName + " not found or damaged!"
-                );
-                /*try {
-                    Process ps = Runtime.getRuntime().exec(
-                        //"cmd /c start iexplore http://ftp.freebsd.org/pub/"
-                        //+ "FreeBSD/ports/packages/All/" + strPackageFileName
-                        //"cmd /c start /MIN "
-                        "cmd /c start /WAIT /MIN "
-                        + "iexplore http://ftp.freebsd.org/pub/"
-                        + "FreeBSD/ports/packages/All/" + strPackageFileName
-                    );
-                    ps.waitFor();
-                }
-                catch(IOException e) {
-                }
-                catch(InterruptedException e) {
-                }*/
-                StringBuilder sb2 = new StringBuilder();
-                sb2.append("Downloading file ").append(m_strPackageFileName);
-                sb2.append("... ");
-                StringBuilder sbFNDest = new StringBuilder();
-                sbFNDest.append(phParms.getPkgStorageDir()).append("/");
-                sbFNDest.append(m_strPackageFileName);
-                LOG.info(sb2.toString());
-                File fDest = new File(sbFNDest.toString());
-                try {
-                    FileUpload.download(
-                        phParms.getProxy(),
-                        phParms.getPkgSrcHost() + "/All", 
-                        null, 
-                        null, 
-                        strPackageFileName, fDest,
-                        phParms.getDownloadErrorTimeout());
-                    LOG.info("OK");
-                    init(strPackageFileName, strBasePackageFileName, phParms);
-                } catch (MalformedURLException e1) {
-                    LOG.error("ERROR!");
-                    LOG.error(e1.getMessage());
-                } catch (IOException e1) {
-                    LOG.error("ERROR!");
-                    LOG.error(e1.getMessage());
-                }
-            }
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            LOG.error(e.getMessage());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            LOG.error(e.getMessage());
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            LOG.error(e.getMessage());
-        } finally {
-            try {
-                if (lineNumberReader != null) lineNumberReader.close();
-                if (fileReader != null) fileReader.close();
-                if (fwrRequiredBy != null) fwrRequiredBy.close();
-                if (lnrReq != null) lnrReq.close();
-                if (frReq != null) frReq.close();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                LOG.error(e.getMessage());
-            }
-        }
-    }
-    
-    /**
-     * Return a string representation.
-     * DO NOT acts recursively!
-     * @return String representation
-     */
     @Override
-    public String toString() {
-        String strFBSDPackInfo = (
-            String.format(
-                "%s -> ", m_strPackageFileName
-            )
-        );
-        
-        if (m_lstPkgDeps.isEmpty()) {
-            strFBSDPackInfo += "NONE\r\n";
-            return strFBSDPackInfo;
+    protected BSDPackage getDependency(String curLine) {
+        if (curLine.startsWith("@pkgdep")) {
+            FBSDPackage pkgDepCur = new FBSDPackage();
+            pkgDepCur.setStrPackageFileName(curLine.substring(8) + ".tbz");
+            return pkgDepCur;
         }
-        
-        for (FBSDPackage pkg : m_lstPkgDeps) {
-            strFBSDPackInfo += pkg.m_strPackageFileName + "; ";
-        }
-        strFBSDPackInfo += PackHoundParameters.getNewline();
-        
-        return strFBSDPackInfo;
+        return null;
     }
-    /* <== Methods end. */
 
-    public PkgVersion getPkgVersion() {
-        String[] pkgFileNameComponents = m_strPackageFileName.split("-");
-        int iComponentsCount = pkgFileNameComponents.length;
-        if (iComponentsCount > 0) {
-            PkgVersion ver = new PkgVersion();
-            try {
-                ver.init(pkgFileNameComponents[iComponentsCount - 1]);
-                return ver;
-            } catch (Exception e) {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-    
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;    // Identical references?
-        }
-        if (!(obj instanceof FBSDPackage)) {
-            return false;    // Correct type and non-null?
-        }
-        FBSDPackage pack = (FBSDPackage) obj;
-        return m_strPackageFileName.equals(pack.m_strPackageFileName);
+    protected String getRelativePathToPkgs() {
+        return "/All";
     }
 }

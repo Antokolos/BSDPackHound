@@ -31,92 +31,19 @@
  */
 package com.nlbhub.packhound.fbsd;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.nlbhub.packhound.bsd.BSDPackInitializer;
+import com.nlbhub.packhound.bsd.BSDPackage;
 
 /**
- * The FBSDPackInitializer class. 
+ * The BSDPackInitializer class.
  *
  * @author Anton P. Kolosov
  * @version 1.0
  */
-public class FBSDPackInitializer {
-    /* Static variables begin ==> */
-    private static Logger LOG = (
-        LoggerFactory.getLogger(FBSDPackInitializer.class)
-    );
-    /* <== Static variables end. */
+public class FBSDPackInitializer extends BSDPackInitializer {
 
-    /* Instance variables begin ==> */
-    private LinkedList<FBSDPackage> m_lstRequiredPackages;
-    /* <== Instance variables end. */
-
-    /* Static blocks begin ==> */
-    /* <== Static blocks end. */
-
-    /* Constructors begin ==> */
-    /**
-     * Creating FBSDPackInitializer
-     */
-    public FBSDPackInitializer() {
-        super();
-        m_lstRequiredPackages = new LinkedList<FBSDPackage>();
+    @Override
+    protected BSDPackage newPackage() {
+        return new FBSDPackage();
     }
-    
-    /* <== Constructors end. */
-    /* Methods begin ==> */
-    public void InitFBSDPacks(
-        String basePkgName, final PackHoundParameters pkgHP
-    ) {
-        FBSDPackage pkg = new FBSDPackage();
-        pkg.init(basePkgName, null, pkgHP);
-        InitFBSDPacks(pkg, pkgHP);
-    }
-    public void InitFBSDPacks(
-        FBSDPackage basePkg, final PackHoundParameters pkgHP
-    ) {
-        ArrayList<FBSDPackage> lstDeps = basePkg.getPkgDeps();
-        
-        if (lstDeps.isEmpty()) {
-            m_lstRequiredPackages.addFirst(basePkg);
-            
-            /*DatabaseProcessor dp = (
-                new DatabaseProcessor("./../db/FBSD_PACKAGES.mdb")
-            );
-            dp.addPackage(basePkg.getPackageFileName());*/
-        } else {
-            m_lstRequiredPackages.addLast(basePkg);
-        }
-        
-        for (FBSDPackage pkgCur : lstDeps) {
-            if (
-                !m_lstRequiredPackages
-                    .contains(pkgCur)
-            ) {
-                pkgCur.init(
-                    pkgCur.getPackageFileName(),
-                    basePkg.getPackageFileName(),
-                    pkgHP
-                );
-                InitFBSDPacks(pkgCur, pkgHP);
-            }
-        }
-    }
-    
-    /**
-     * Prints required packages and its dependencies.
-     */
-    public void printRequiredPackages() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Required packages: ");
-        sb.append(PackHoundParameters.getNewline());
-        for (FBSDPackage pkgCur : m_lstRequiredPackages) {
-            sb.append(pkgCur.toString());
-        }
-        LOG.info(sb.toString());
-    }
-    /* <== Methods end. */
 }

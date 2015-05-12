@@ -35,7 +35,7 @@ import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
-import com.nlbhub.packhound.fbsd.PackHoundParameters;
+import com.nlbhub.packhound.config.PackHoundParameters;
 import org.apache.tools.bzip2.*;
 import org.apache.tools.tar.*;
 import org.slf4j.Logger;

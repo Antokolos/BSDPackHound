@@ -46,7 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nlbhub.packhound.fbsd.FBSDPackInitializer;
-import com.nlbhub.packhound.fbsd.PackHoundParameters;
+import com.nlbhub.packhound.config.PackHoundParameters;
 import com.nlbhub.packhound.arch.UnTbz;
 
 /**
