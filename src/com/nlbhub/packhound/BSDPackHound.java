@@ -71,11 +71,12 @@ public class BSDPackHound {
     /* <== Constructors end. */
     /* Methods begin ==> */
     public static void main(String[] args) {
-        BSDPackNameResolver packNameResolver = new FBSDPackNameResolver();
         PackHoundParameters phParm = new PackHoundParameters();
         phParm.init();
+        EntityCreator creator = new EntityCreator(phParm);
 
         try {
+            BSDPackNameResolver packNameResolver = creator.newBSDPackNameResolver();
             FileHelper.createDirIfNotExists(phParm.getPkgStorageDir());
             FileHelper.createDirIfNotExists(phParm.getPkgDatabaseDir());
             FileHelper.createDirIfNotExists(phParm.getUnpackTempDir());
@@ -92,7 +93,7 @@ public class BSDPackHound {
                 installScriptWriter.append("pkg_add ").append(fullPackageName).append(PackHoundParameters.getNewline());
                 installScriptWriter.flush();
                 if (fullPackageName != null) {
-                    BSDPackInitializer fbpi =  new FBSDPackInitializer();
+                    BSDPackInitializer fbpi = creator.newBSDPackInitializer();
 
                     fbpi.initBSDPacks(fullPackageName, phParm);
                     fbpi.printRequiredPackages();

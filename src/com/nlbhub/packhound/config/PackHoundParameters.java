@@ -31,7 +31,6 @@
  */
 package com.nlbhub.packhound.config;
 
-import java.io.IOException;
 import java.net.Authenticator;
 import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
@@ -58,6 +57,7 @@ public class PackHoundParameters {
     private static final String UNPACK_TEMP_DIR = "unpack.temp.dir";
     private static final String UNPACK_TEMP_FILE = "unpack.temp.file";
     private static final String PKG_DATABASE_DIR = "pkg.database.dir";
+    private static final String OS_NAME = "os.name";
     private static final String INDEX_SRC_HOST = "index.src.host";
     private static final String PKG_SRC_HOST = "pkg.src.host";
     private static final String ALWAYS_RELOAD_INDEX = "always.reload.index";
@@ -77,6 +77,7 @@ public class PackHoundParameters {
     private String m_unpackTempDir;
     private String m_unpackTempFile;
     private String m_pkgDatabaseDir;
+    private OSType m_OSType;
     private String m_indexSrcHost;
     private String m_pkgSrcHost;
     private boolean m_alwaysReloadIndex;
@@ -112,6 +113,11 @@ public class PackHoundParameters {
             m_unpackTempDir = props.getProperty(UNPACK_TEMP_DIR);
             m_unpackTempFile = props.getProperty(UNPACK_TEMP_FILE);
             m_pkgDatabaseDir = props.getProperty(PKG_DATABASE_DIR);
+            String osName = props.getProperty(OS_NAME);
+            m_OSType = OSType.fromName(osName);
+            if (m_OSType == OSType.UNKNOWN) {
+                throw new Exception("OS type '" + osName + "' is unknown to me");
+            }
             m_indexSrcHost = props.getProperty(INDEX_SRC_HOST);
             m_pkgSrcHost = props.getProperty(PKG_SRC_HOST);
             m_alwaysReloadIndex = (
@@ -172,11 +178,7 @@ public class PackHoundParameters {
             } else {
                 m_proxy = null;
             }
-        } catch (IOException e) {
-            System.out.println(
-                "pkghound.properties load failed: " + e.getMessage()
-            );
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             System.out.println(
                 "pkghound.properties load failed: " + e.getMessage()
             );
@@ -213,6 +215,10 @@ public class PackHoundParameters {
     
     public Proxy getProxy() {
         return m_proxy;
+    }
+
+    public OSType getOSType() {
+        return m_OSType;
     }
 
     public String getIndexSrcHost() {
