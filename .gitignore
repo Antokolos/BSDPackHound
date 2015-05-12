@@ -14,7 +14,7 @@
 ## File-based project format
 *.ipr
 *.iws
-*.iml
+# *.iml -- do not exclude module
 
 ## Additional for IntelliJ
 out/
