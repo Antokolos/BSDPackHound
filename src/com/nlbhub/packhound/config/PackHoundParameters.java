@@ -58,6 +58,7 @@ public class PackHoundParameters {
     private static final String UNPACK_TEMP_DIR = "unpack.temp.dir";
     private static final String UNPACK_TEMP_FILE = "unpack.temp.file";
     private static final String PKG_DATABASE_DIR = "pkg.database.dir";
+    private static final String INDEX_SRC_HOST = "index.src.host";
     private static final String PKG_SRC_HOST = "pkg.src.host";
     private static final String ALWAYS_RELOAD_INDEX = "always.reload.index";
     private static final String DOWNLOAD_ERROR_TIMEOUT = "download.error.timeout";
@@ -76,6 +77,7 @@ public class PackHoundParameters {
     private String m_unpackTempDir;
     private String m_unpackTempFile;
     private String m_pkgDatabaseDir;
+    private String m_indexSrcHost;
     private String m_pkgSrcHost;
     private boolean m_alwaysReloadIndex;
     private Proxy m_proxy;
@@ -110,6 +112,7 @@ public class PackHoundParameters {
             m_unpackTempDir = props.getProperty(UNPACK_TEMP_DIR);
             m_unpackTempFile = props.getProperty(UNPACK_TEMP_FILE);
             m_pkgDatabaseDir = props.getProperty(PKG_DATABASE_DIR);
+            m_indexSrcHost = props.getProperty(INDEX_SRC_HOST);
             m_pkgSrcHost = props.getProperty(PKG_SRC_HOST);
             m_alwaysReloadIndex = (
                 props.getProperty(ALWAYS_RELOAD_INDEX).toLowerCase()
@@ -127,6 +130,7 @@ public class PackHoundParameters {
                 LOG.debug(UNPACK_TEMP_DIR + " = " + m_unpackTempDir);
                 LOG.debug(UNPACK_TEMP_FILE + " = " + m_unpackTempFile);
                 LOG.debug(PKG_DATABASE_DIR + " = " + m_pkgDatabaseDir);
+                LOG.debug(INDEX_SRC_HOST + " = " + m_indexSrcHost);
                 LOG.debug(PKG_SRC_HOST + " = " + m_pkgSrcHost);
                 LOG.debug("Use proxy: " + (useProxy ? "yes" : "no"));
                 LOG.debug(
@@ -210,7 +214,11 @@ public class PackHoundParameters {
     public Proxy getProxy() {
         return m_proxy;
     }
-    
+
+    public String getIndexSrcHost() {
+        return m_indexSrcHost;
+    }
+
     public String getPkgSrcHost() {
         return m_pkgSrcHost;
     }

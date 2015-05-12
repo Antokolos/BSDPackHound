@@ -73,7 +73,7 @@ public class FBSDPackNameResolver implements BSDPackNameResolver {
             try {
                 FileUpload.download(
                         phParms.getProxy(),
-                        phParms.getPkgSrcHost(),
+                        phParms.getIndexSrcHost(),
                         null,
                         null,
                         "/INDEX.bz2", fDest,

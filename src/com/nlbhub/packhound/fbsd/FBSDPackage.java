@@ -58,9 +58,4 @@ public class FBSDPackage extends BSDPackage {
         }
         return null;
     }
-
-    @Override
-    protected String getRelativePathToPkgs() {
-        return "/All";
-    }
 }

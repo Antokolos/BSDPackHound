@@ -206,7 +206,7 @@ public abstract class BSDPackage {
                 try {
                     FileUpload.download(
                             phParms.getProxy(),
-                            phParms.getPkgSrcHost() + getRelativePathToPkgs(),
+                            phParms.getPkgSrcHost(),
                             null,
                             null,
                             strPackageFileName, fDest,
@@ -247,8 +247,6 @@ public abstract class BSDPackage {
     protected abstract PkgEntry newPkgEntry();
 
     protected abstract BSDPackage getDependency(String curLine);
-
-    protected abstract String getRelativePathToPkgs();
 
     public void setStrPackageFileName(String strPackageFileName) {
         m_strPackageFileName = strPackageFileName;
