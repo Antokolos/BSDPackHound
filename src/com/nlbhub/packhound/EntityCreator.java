@@ -5,6 +5,8 @@ import com.nlbhub.packhound.bsd.BSDPackNameResolver;
 import com.nlbhub.packhound.config.PackHoundParameters;
 import com.nlbhub.packhound.fbsd.FBSDPackInitializer;
 import com.nlbhub.packhound.fbsd.FBSDPackNameResolver;
+import com.nlbhub.packhound.obsd.OBSDPackInitializer;
+import com.nlbhub.packhound.obsd.OBSDPackNameResolver;
 
 /**
  * The EntityCreator class.
@@ -24,7 +26,7 @@ public class EntityCreator {
             case OS_FREEBSD:
                 return new FBSDPackNameResolver();
             case OS_OPENBSD:
-                return new FBSDPackNameResolver();
+                return new OBSDPackNameResolver();
             default:
                 throw new Exception("OS type is unknown");
         }
@@ -35,7 +37,7 @@ public class EntityCreator {
             case OS_FREEBSD:
                 return new FBSDPackInitializer();
             case OS_OPENBSD:
-                return new FBSDPackInitializer();
+                return new OBSDPackInitializer();
             default:
                 throw new Exception("OS type is unknown");
         }

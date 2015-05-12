@@ -36,6 +36,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 import com.nlbhub.packhound.config.PackHoundParameters;
+import com.sun.developer.technicalarticles.programming.compression.UnZip;
 import org.apache.tools.bzip2.*;
 import org.apache.tools.tar.*;
 import org.slf4j.Logger;
@@ -65,6 +66,21 @@ public class UnTbz {
         )) return false;
         if (!unTarFBSDPackageContents(
             sbOutFName.toString(), phParms.getUnpackTempDir() + "/"
+        )) return false;
+        return true;
+    }
+    public static boolean unTgzOBSDPackageContents(
+            PackHoundParameters phParms, String zipFName
+    ) {
+        StringBuilder sbOutFName = new StringBuilder();
+        sbOutFName.append(phParms.getUnpackTempDir()).append("/");
+        sbOutFName.append(phParms.getUnpackTempFile());
+        StringBuilder sbInFName = new StringBuilder();
+        sbInFName.append(phParms.getPkgStorageDir()).append("/");
+        sbInFName.append(zipFName);
+        if (!UnZip.uzip(sbInFName.toString(), sbOutFName.toString())) return false;
+        if (!unTarFBSDPackageContents(
+                sbOutFName.toString(), phParms.getUnpackTempDir() + "/"
         )) return false;
         return true;
     }

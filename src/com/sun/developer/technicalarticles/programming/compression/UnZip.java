@@ -16,7 +16,7 @@ public class UnZip {
     private static Logger LOG = LoggerFactory.getLogger(UnZip.class);
     
     final static int BUFFER = 2048;
-    public static boolean uzip (String zipFName) {
+    public static boolean uzip (String zipFName, String targetName) {
         boolean result = false;
         try {
             BufferedOutputStream dest = null;
@@ -36,7 +36,7 @@ public class UnZip {
                 byte data[] = new byte[BUFFER];
 
                 // write the files to the disk
-                FileOutputStream fos = new FileOutputStream(entry.getName());
+                FileOutputStream fos = new FileOutputStream(targetName != null ? targetName : entry.getName());
 
                 dest = new BufferedOutputStream(fos, BUFFER);
 
