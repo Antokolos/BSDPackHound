@@ -38,7 +38,7 @@ package com.nlbhub.packhound.config;
  * @version 1.0
  */
 public enum  OSType {
-    UNDEFINED(""),
+    UNKNOWN(""),
     OS_FREEBSD("FreeBSD"),
     OS_OPENBSD("OpenBSD");
 
@@ -58,7 +58,7 @@ public enum  OSType {
         } else if ("OpenBSD".equalsIgnoreCase(name)) {
             return OS_OPENBSD;
         } else {
-            return UNDEFINED;
+            return UNKNOWN;
         }
     }
 }
