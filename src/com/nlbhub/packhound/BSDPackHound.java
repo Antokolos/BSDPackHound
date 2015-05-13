@@ -33,6 +33,7 @@ package com.nlbhub.packhound;
 
 import com.nlbhub.packhound.bsd.BSDPackInitializer;
 import com.nlbhub.packhound.bsd.BSDPackNameResolver;
+import com.nlbhub.packhound.bsd.BSDPackage;
 import com.nlbhub.packhound.config.PackHoundParameters;
 import com.nlbhub.packhound.fbsd.FBSDPackInitializer;
 import com.nlbhub.packhound.fbsd.FBSDPackNameResolver;
@@ -42,6 +43,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The BSDPackHound class.
@@ -90,12 +93,19 @@ public class BSDPackHound {
             );
             for (int i = 0; i < args.length; i++) {
                 String fullPackageName = packNameResolver.getFullPackageName(args[i], phParm);
-                installScriptWriter.append("pkg_add ").append(fullPackageName).append(PackHoundParameters.getNewline());
-                installScriptWriter.flush();
                 if (fullPackageName != null) {
                     BSDPackInitializer fbpi = creator.newBSDPackInitializer();
 
                     fbpi.initBSDPacks(fullPackageName, phParm);
+                    final List<BSDPackage> lstRequiredPackages = fbpi.getLstRequiredPackages();
+                    for (int j = 0; j < lstRequiredPackages.size() - 1; j++) {
+                        BSDPackage bsdPackage = lstRequiredPackages.get(j);
+                        installScriptWriter.append("pkg_add -a ").append(bsdPackage.getPackageFileName()).append(PackHoundParameters.getNewline());
+                        installScriptWriter.flush();
+                    }
+                    BSDPackage bsdPackage = lstRequiredPackages.get(lstRequiredPackages.size() - 1);
+                    installScriptWriter.append("pkg_add ").append(bsdPackage.getPackageFileName()).append(PackHoundParameters.getNewline());
+                    installScriptWriter.flush();
                     fbpi.printRequiredPackages();
                     LOG.info("Process finished for package " + args[i]);
                 } else {

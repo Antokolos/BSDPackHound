@@ -32,7 +32,9 @@
 package com.nlbhub.packhound.bsd;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 import com.nlbhub.packhound.config.PackHoundParameters;
 import org.slf4j.Logger;
@@ -52,7 +54,7 @@ public abstract class BSDPackInitializer {
     /* <== Static variables end. */
 
     /* Instance variables begin ==> */
-    private LinkedList<BSDPackage> m_lstRequiredPackages;
+    private List<BSDPackage> m_lstRequiredPackages;
     /* <== Instance variables end. */
 
     /* Static blocks begin ==> */
@@ -64,7 +66,7 @@ public abstract class BSDPackInitializer {
      */
     protected BSDPackInitializer() {
         super();
-        m_lstRequiredPackages = new LinkedList<BSDPackage>();
+        m_lstRequiredPackages = new ArrayList<BSDPackage>();
     }
 
     /* <== Constructors end. */
@@ -84,16 +86,7 @@ public abstract class BSDPackInitializer {
     ) {
         ArrayList<BSDPackage> lstDeps = basePkg.getPkgDeps();
 
-        if (lstDeps.isEmpty()) {
-            m_lstRequiredPackages.addFirst(basePkg);
-            
-            /*DatabaseProcessor dp = (
-                new DatabaseProcessor("./../db/FBSD_PACKAGES.mdb")
-            );
-            dp.addPackage(basePkg.getPackageFileName());*/
-        } else {
-            m_lstRequiredPackages.addLast(basePkg);
-        }
+        m_lstRequiredPackages.add(basePkg);
 
         for (BSDPackage pkgCur : lstDeps) {
             if (
@@ -108,6 +101,11 @@ public abstract class BSDPackInitializer {
                 initBSDPacks(pkgCur, pkgHP);
             }
         }
+        Collections.sort(m_lstRequiredPackages);
+    }
+
+    public List<BSDPackage> getLstRequiredPackages() {
+        return m_lstRequiredPackages;
     }
 
     /**

@@ -49,7 +49,7 @@ import java.util.ArrayList;
  * @author Anton P. Kolosov
  * @version 1.0
  */
-public abstract class BSDPackage {
+public abstract class BSDPackage implements Comparable {
     /* Static variables begin ==> */
     private static Logger LOG = LoggerFactory.getLogger(BSDPackage.class);
     /* <== Static variables end. */
@@ -74,6 +74,26 @@ public abstract class BSDPackage {
     }
     /* <== Constructors end. */
     /* Methods begin ==> */
+
+    @Override
+    public int compareTo(Object o) {
+        int compareResult = -1;
+        if (o instanceof BSDPackage) {
+            BSDPackage pkg = (BSDPackage) o;
+            for (BSDPackage dep : getPkgDeps()) {
+                if (dep.getPackageFileName().equalsIgnoreCase(pkg.getPackageFileName())) {
+                    return 1;
+                }
+            }
+            for (BSDPackage dep : getPkgDeps()) {
+                int localResult = dep.compareTo(pkg);
+                if (localResult > compareResult) {
+                    compareResult = localResult;
+                }
+            }
+        }
+        return compareResult;
+    }
 
     /**
      * Gets m_strPackageFileName
