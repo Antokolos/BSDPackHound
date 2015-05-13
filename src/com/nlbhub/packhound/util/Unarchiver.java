@@ -74,7 +74,7 @@ public class Unarchiver {
         return true;
     }
 
-    private static boolean unbz(String zipFName, String outFName) {
+    public static boolean unbz(String zipFName, String outFName) {
         try {
             BufferedOutputStream dest = null;
             FileInputStream fis = ( 
@@ -121,7 +121,7 @@ public class Unarchiver {
     /**
      * GunZip it
      */
-    private static boolean gunzip(String gzipFName, String targetName){
+    public static boolean gunzip(String gzipFName, String targetName){
 
         byte[] buffer = new byte[1024];
 
@@ -147,7 +147,7 @@ public class Unarchiver {
         }
     }
 
-    private static boolean untar(String zipFName, String tempDirName) {
+    public static boolean untar(String zipFName, String tempDirName) {
         try {
             BufferedOutputStream dest = null;
             FileInputStream fis = ( 
