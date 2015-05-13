@@ -1,5 +1,5 @@
 /*
- * @(#)UnTbz.java
+ * @(#)Unarchiver.java
  *
  * Copyright (c) 2015, Anton P. Kolosov
  * All rights reserved.
@@ -29,14 +29,11 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.nlbhub.packhound.arch;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+package com.nlbhub.packhound.util;
+import java.io.*;
+import java.util.zip.GZIPInputStream;
 
 import com.nlbhub.packhound.config.PackHoundParameters;
-import com.sun.developer.technicalarticles.programming.compression.UnZip;
 import org.apache.tools.bzip2.*;
 import org.apache.tools.tar.*;
 import org.slf4j.Logger;
@@ -44,47 +41,40 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * The UnTbz class. 
+ * The Unarchiver class.
  *
  * @author Anton P. Kolosov
  * @version 1.0
  */
-public class UnTbz {
-    private static Logger LOG = LoggerFactory.getLogger(UnTbz.class);
+public class Unarchiver {
+    private static Logger LOG = LoggerFactory.getLogger(Unarchiver.class);
     final static int BUFFER = 2048;
-    public static boolean unTbzFBSDPackageContents(
-        PackHoundParameters phParms, String zipFName
-    ) { 
+
+    public static boolean untbz(PackHoundParameters phParms, String zipFName) {
         StringBuilder sbOutFName = new StringBuilder();
         sbOutFName.append(phParms.getUnpackTempDir()).append("/");
         sbOutFName.append(phParms.getUnpackTempFile());
         StringBuilder sbInFName = new StringBuilder();
         sbInFName.append(phParms.getPkgStorageDir()).append("/");
         sbInFName.append(zipFName);
-        if (!unbz(
-            sbInFName.toString(), sbOutFName.toString()
-        )) return false;
-        if (!unTarFBSDPackageContents(
-            sbOutFName.toString(), phParms.getUnpackTempDir() + "/"
-        )) return false;
+        if (!unbz(sbInFName.toString(), sbOutFName.toString())) return false;
+        if (!untar(sbOutFName.toString(), phParms.getUnpackTempDir() + "/")) return false;
         return true;
     }
-    public static boolean unTgzOBSDPackageContents(
-            PackHoundParameters phParms, String zipFName
-    ) {
+
+    public static boolean untgz(PackHoundParameters phParms, String zipFName) {
         StringBuilder sbOutFName = new StringBuilder();
         sbOutFName.append(phParms.getUnpackTempDir()).append("/");
         sbOutFName.append(phParms.getUnpackTempFile());
         StringBuilder sbInFName = new StringBuilder();
         sbInFName.append(phParms.getPkgStorageDir()).append("/");
         sbInFName.append(zipFName);
-        if (!UnZip.uzip(sbInFName.toString(), sbOutFName.toString())) return false;
-        if (!unTarFBSDPackageContents(
-                sbOutFName.toString(), phParms.getUnpackTempDir() + "/"
-        )) return false;
+        if (!gunzip(sbInFName.toString(), sbOutFName.toString())) return false;
+        if (!untar(sbOutFName.toString(), phParms.getUnpackTempDir() + "/")) return false;
         return true;
     }
-    public static boolean unbz(String zipFName, String outFName) {
+
+    private static boolean unbz(String zipFName, String outFName) {
         try {
             BufferedOutputStream dest = null;
             FileInputStream fis = ( 
@@ -127,10 +117,37 @@ public class UnTbz {
             return false;
         }
     }
-    
-    public static boolean unTarFBSDPackageContents(
-        String zipFName, String tempDirName
-    ) {
+
+    /**
+     * GunZip it
+     */
+    private static boolean gunzip(String gzipFName, String targetName){
+
+        byte[] buffer = new byte[1024];
+
+        try{
+
+            GZIPInputStream gzis =
+                    new GZIPInputStream(new FileInputStream(gzipFName));
+
+            FileOutputStream out =
+                    new FileOutputStream(targetName);
+
+            int len;
+            while ((len = gzis.read(buffer)) > 0) {
+                out.write(buffer, 0, len);
+            }
+
+            gzis.close();
+            out.close();
+            return true;
+        } catch(IOException ex){
+            LOG.error(ex.getMessage());
+            return false;
+        }
+    }
+
+    private static boolean untar(String zipFName, String tempDirName) {
         try {
             BufferedOutputStream dest = null;
             FileInputStream fis = ( 

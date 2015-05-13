@@ -77,9 +77,7 @@ public abstract class PkgEntry {
      * has been successfully extracted from package file, <TT>false</TT>
      * otherwise.
      */
-    public boolean init(
-            String strPackageFileName, PackHoundParameters phParms
-    ) throws Exception {
+    public boolean init(String strPackageFileName, PackHoundParameters phParms) throws Exception {
         int iExtensionPos = strPackageFileName.lastIndexOf(".");
         m_strPackageDirName = (
                 strPackageFileName.substring(0, iExtensionPos)

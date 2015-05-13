@@ -1,6 +1,5 @@
 package com.nlbhub.packhound.obsd;
 
-import com.nlbhub.packhound.arch.UnTbz;
 import com.nlbhub.packhound.bsd.BSDPackNameResolver;
 import com.nlbhub.packhound.config.PackHoundParameters;
 import net.javabeat.ftp.FileUpload;
@@ -12,31 +11,37 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.net.MalformedURLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Antokolos on 12.05.15.
  */
 public class OBSDPackNameResolver implements BSDPackNameResolver {
+    private static final Pattern PKG_FILE_NAME_PATTERN = Pattern.compile("\\s([^\\s]*\\.tgz)$");
     private static Logger LOG = LoggerFactory.getLogger(OBSDPackNameResolver.class);
 
     @Override
     public void retrieveIndex(boolean forceIndexReload, PackHoundParameters phParms) {
-        LOG.info("Checking INDEX file...");
-        File indexFile = new File(phParms.getUnpackTempDir() + "/INDEX");
+        /*
+         * We can get INDEX file from ports.tar.gz archive. But since we need only filenames, we can use index.txt
+         */
+        LOG.info("Checking index.txt file...");
+        File indexFile = new File(phParms.getPkgStorageDir() + "/index.txt");
         if (!forceIndexReload && indexFile.exists()) {
             LOG.info("OK");
         } else {
-            LOG.info("INDEX file not found!");
-            LOG.info("Downloading INDEX file...");
+            LOG.info("index.txt file not found!");
+            LOG.info("Downloading index.txt file...");
 
-            File fDest = new File(phParms.getPkgStorageDir(), "INDEX");
+            File fDest = new File(phParms.getPkgStorageDir(), "index.txt");
             try {
                 FileUpload.download(
                         phParms.getProxy(),
                         phParms.getIndexSrcHost(),
                         null,
                         null,
-                        "/INDEX", fDest,
+                        "/index.txt", fDest,
                         phParms.getDownloadErrorTimeout());
                 LOG.info("OK");
                 retrieveIndex(false, phParms);
@@ -53,7 +58,7 @@ public class OBSDPackNameResolver implements BSDPackNameResolver {
     @Override
     public String getFullPackageName(String pkgNameWithoutVersion, PackHoundParameters phParms) throws IOException {
         FileReader fileReader = (
-                new FileReader(new File(phParms.getUnpackTempDir(), "INDEX"))
+                new FileReader(new File(phParms.getPkgStorageDir(), "index.txt"))
         );
         LineNumberReader lineNumberReader = new LineNumberReader(fileReader);
         String strCurLine = null;
@@ -73,19 +78,19 @@ public class OBSDPackNameResolver implements BSDPackNameResolver {
         do {
             strCurLine = lineNumberReader.readLine();
             if (strCurLine != null) {
-                int idx = strCurLine.indexOf("|");
-                if (idx > 0) {
-                    String fullPkgName = strCurLine.substring(0, idx);
+                Matcher matcher = PKG_FILE_NAME_PATTERN.matcher(strCurLine);
+                if (matcher.find()) {
+                    String fullPkgName = matcher.group(1);
                     if (searchLike) {
                         if (fullPkgName.matches(strToSearch)) {
-                            return (fullPkgName + ".tgz");
+                            return fullPkgName;
                         }
                     } else {
                         int idx2 = fullPkgName.lastIndexOf("-");
                         if (idx2 > 0) {
-                            String pkgCur = strCurLine.substring(0, idx2);
-                            if (pkgCur.equals(strToSearch)) {
-                                return fullPkgName + ".tgz";
+                            String pkgCur = fullPkgName.substring(0, idx2);
+                            if (pkgCur.equalsIgnoreCase(strToSearch)) {
+                                return fullPkgName;
                             }
                         }
                     }

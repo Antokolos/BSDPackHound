@@ -31,7 +31,7 @@
  */
 package com.nlbhub.packhound.fbsd;
 
-import com.nlbhub.packhound.arch.UnTbz;
+import com.nlbhub.packhound.util.Unarchiver;
 import com.nlbhub.packhound.bsd.BSDPackNameResolver;
 import com.nlbhub.packhound.config.PackHoundParameters;
 import net.javabeat.ftp.FileUpload;
@@ -59,7 +59,7 @@ public class FBSDPackNameResolver implements BSDPackNameResolver {
         LOG.info("Unpacking INDEX.bz2...");
         if (
                 !forceIndexReload &&
-                        UnTbz.unbz(
+                        Unarchiver.unbz(
                                 phParms.getPkgStorageDir() + "/INDEX.bz2",
                                 phParms.getUnpackTempDir() + "/INDEX"
                         )

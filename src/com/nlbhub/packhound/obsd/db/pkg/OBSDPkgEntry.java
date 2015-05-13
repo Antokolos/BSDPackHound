@@ -1,6 +1,6 @@
 package com.nlbhub.packhound.obsd.db.pkg;
 
-import com.nlbhub.packhound.arch.UnTbz;
+import com.nlbhub.packhound.util.Unarchiver;
 import com.nlbhub.packhound.bsd.db.pkg.PkgEntry;
 import com.nlbhub.packhound.config.PackHoundParameters;
 
@@ -10,6 +10,6 @@ import com.nlbhub.packhound.config.PackHoundParameters;
 public class OBSDPkgEntry extends PkgEntry {
     @Override
     public boolean unpackPackageContents(PackHoundParameters phParms, String zipFName) {
-        return UnTbz.unTgzOBSDPackageContents(phParms, zipFName);
+        return Unarchiver.untgz(phParms, zipFName);
     }
 }
